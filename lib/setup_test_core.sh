@@ -55,7 +55,7 @@ check_kernel_message_nobug() {
     fi
 }
 
-# Usage: do_test <test command> <test controller> <result checker>
+# Usage: do_test <testtitle> <external command> <test controller> <result checker>
 # if you need other test program to reproduce the problem, use this function.
 do_test() {
     local title="$1"
@@ -95,7 +95,7 @@ do_test() {
     echo "---test done ($title)------------------------------------------------"
 }
 
-# Usage: do_test_async <prepare> <cleanup> <test controller> <result checker>
+# Usage: do_test_async <testtitle> <test controller> <result checker>
 # if you don't need any external program to reproduce the problem (IOW, you can
 # reproduce in the test controller,) use this async function.
 do_test_async() {
