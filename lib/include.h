@@ -65,6 +65,16 @@
 int verbose = 0;
 char *testpipe = NULL;
 
+static int checked_open(const char *pathname, int flags)
+{
+        int fd = open(pathname, flags);
+        if (fd < 0) {
+                perror(pathname);
+                exit(EXIT_FAILURE);
+        }
+        return fd;
+}
+
 void *checked_mmap(void *start, size_t length, int prot, int flags,
                    int fd, off_t offset) {
 	void *map = mmap(start, length, prot, flags, fd, offset);
