@@ -38,6 +38,7 @@ control_sample() {
     return 1
 }
 
+# inside cheker you must tee output in you own.
 check_sample() {
     local result="$1"
     check_kernel_message -v diff "failed"

@@ -2,7 +2,7 @@
 
 PIPE=${TMPF}.pipe
 mkfifo ${PIPE} 2> /dev/null
-[ ! -p ${PIPE} ] && echo "Fail to create pipe." >&2 && exit 1
+[ ! -p ${PIPE} ] && echo_log "Fail to create pipe." >&2 && exit 1
 chmod a+x ${PIPE}
 PIPETIMEOUT=5
 
@@ -57,7 +57,7 @@ check_kernel_message_nobug() {
 
 # Usage: do_test <testtitle> <external command> <test controller> <result checker>
 # if you need other test program to reproduce the problem, use this function.
-do_test() {
+_do_test() {
     local title="$1"
     local cmd="$2"
     local controller="$3"
@@ -90,15 +90,26 @@ do_test() {
     done
 
     cleanup_test "$title"
+    echo $result > ${TMPF}.returncode
+}
 
-    eval $checker "$result"
-    echo "---test done ($title)------------------------------------------------"
+# A wrapper of _do_test() to copy the test output into result file.
+# note that $checker should 'tee' the output inside itself, because
+# it updates global variables and shouldn't called in sub-process.
+do_test() {
+    local title="$1"
+    local cmd="$2"
+    local controller="$3"
+    local checker="$4"
+    _do_test "$title" "$cmd" "$controller" "$checker" | log
+    $checker "$(cat ${TMPF}.returncode)"
+    echo_log "---test done ($title)------------------------------------------------"
 }
 
 # Usage: do_test_async <testtitle> <test controller> <result checker>
 # if you don't need any external program to reproduce the problem (IOW, you can
 # reproduce in the test controller,) use this async function.
-do_test_async() {
+_do_test_async() {
     local title="$1"
     local controller="$2"
     local checker="$3"
@@ -108,8 +119,17 @@ do_test_async() {
     echo "$FUNCNAME '$title' $controller $checker"
 
     prepare_test "$title"
-    eval $controller
+    $controller
     cleanup_test "$title"
-    eval $checker "$result"
-    echo "---test done ($title)------------------------------------------------"
+    echo $result > ${TMPF}.returncode
+}
+
+# A wrapper of _do_test_async() to copy the test output into result file.
+do_test_async() {
+    local title="$1"
+    local controller="$2"
+    local checker="$3"
+    _do_test_async "$title" "$controller" "$checker" | log
+    $checker "$(cat ${TMPF}.returncode)"
+    echo_log "---test done ($title)------------------------------------------------"
 }

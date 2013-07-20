@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ "$0" =~ "$BASH_SOURCE" ]] ; then
-    echo "$BASH_SOURCE should be included from another script, not directly called."
+    echo_log "$BASH_SOURCE should be included from another script, not directly called."
     exit 1
 fi
 
@@ -9,9 +9,9 @@ BASEVFN=0x700000000
 
 # Set global variable to the path of your test helper programs
 PAGETYPES=${LDIR}/page-types
-[ ! -x "$PAGETYPES" ] && echo "${PAGETYPES} not found." >&2 && exit 1
+[ ! -x "$PAGETYPES" ] && echo_log "${PAGETYPES} not found." >&2 && exit 1
 MCEINJECT=${LDIR}/mceinj.sh
-[ ! -x "$MCEINJECT" ] && echo "${MCEINJECT} not found." >&2 && exit 1
+[ ! -x "$MCEINJECT" ] && echo_log "${MCEINJECT} not found." >&2 && exit 1
 
 # Define caller of your test helper programs
 # Here is an example of hwpoison tools
@@ -42,4 +42,4 @@ check_nr_hwcorrupted() {
 ! lsmod | grep mce_inject      > /dev/null && modprobe mce_inject
 ! lsmod | grep hwpoison_inject > /dev/null && modprobe hwpoison_inject
 ! which expect > /dev/null && \
-    echo "You need to install expect to run this test." >&2 && exit 1
+    echo_log "You need to install expect to run this test." >&2 && exit 1

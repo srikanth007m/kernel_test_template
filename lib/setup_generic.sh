@@ -23,6 +23,17 @@ FAILURE=0
 LATER=0   # known failure
 FALSENEGATIVE=false
 
+# print test output with copying into result file. Using tee command
+# for example with "do_test | tee $OFILE" doesn't work because do_test
+# runs in sub-process, and testcase/success/failure counts are broken.
+echo_log() {
+    echo "$@" | tee -a $OFILE
+}
+
+log() {
+    perl -ne 'print "$_"' | tee -a $OFILE
+}
+
 count_testcount() {
     local nonewline=
     while true ; do
@@ -31,7 +42,7 @@ count_testcount() {
             *) break ;;
         esac
     done
-    [ "$@" ] && echo $nonewline "$@"
+    [ "$@" ] && echo_log $nonewline "$@"
     TESTCOUNT=$((TESTCOUNT+1))
 }
 
@@ -45,10 +56,10 @@ count_success() {
     done
     if [ "$FALSENEGATIVE" = false ] ; then
         SUCCESS=$((SUCCESS+1))
-        echo $nonewline "PASS: $@"
+        echo_log $nonewline "PASS: $@"
     else
         LATER=$((LATER+1))
-        echo $nonewline "LATER: PASS: $@"
+        echo_log $nonewline "LATER: PASS: $@"
     fi
 }
 
@@ -62,15 +73,14 @@ count_failure() {
     done
     if [ "$FALSENEGATIVE" = false ] ; then
         FAILURE=$((FAILURE+1))
-        echo $nonewline "FAIL: $@"
+        echo_log $nonewline "FAIL: $@"
     else
         LATER=$((LATER+1))
-        echo $nonewline "LATER: FAIL: $@"
+        echo_log $nonewline "LATER: FAIL: $@"
     fi
-    
 }
 
 show_summary() {
-    echo "$TESTNAME:" | tee -a $OFILE
-    echo "$TESTCOUNT test(s) ran, $SUCCESS passed, $FAILURE failed, $LATER laters." | tee -a $OFILE
+    echo_log "$TESTNAME:"
+    echo_log "$TESTCOUNT test(s) ran, $SUCCESS passed, $FAILURE failed, $LATER laters."
 }
