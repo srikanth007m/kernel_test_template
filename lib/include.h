@@ -12,7 +12,7 @@
 #define err(x) perror(x),exit(EXIT_FAILURE)
 #define errmsg(x) fprintf(stderr, x),exit(EXIT_FAILURE)
 #define PSIZE 4096
-#define HPSIZE 512*4096
+int HPSIZE = 0;
 #define PS PSIZE
 #define HPS HPSIZE
 #define strpair(x) x, strlen(x)

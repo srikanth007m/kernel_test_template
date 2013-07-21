@@ -8,6 +8,7 @@ TESTNAME=sample
 . lib/setup_sample_test.sh
 
 do_test 'sample test' "${SAMPLE} -m private -n1 -p ${PIPE}" control_sample check_sample
+do_test 'sample test' "${SAMPLE} -h 2048 -m private -n1 -p ${PIPE}" control_sample check_sample
 do_test_async 'sample async test' control_sample_async check_sample_async
 
 show_summary

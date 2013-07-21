@@ -19,11 +19,19 @@ int main(int argc, char *argv[]) {
 	int nr = 2;
 	char c;
 	char *p;
-	int mapflag = MAP_ANONYMOUS|MAP_HUGETLB;
+	int mapflag = MAP_ANONYMOUS;
 	int protflag = PROT_READ|PROT_WRITE;
+	unsigned long memsize = 0;
 
-	while ((c = getopt(argc, argv, "m:p:n:")) != -1) {
+	while ((c = getopt(argc, argv, "h:m:p:n:v")) != -1) {
 		switch(c) {
+                case 'h':
+                        HPS = strtoul(optarg, NULL, 10) * 1024;
+                        /* todo: arch independent */
+                        if (HPS != 2097152 && HPS != 1073741824)
+                                errmsg("Invalid hugepage size\n");
+			mapflag |= MAP_HUGETLB;
+                        break;
 		case 'm':
 			if (!strcmp(optarg, "private"))
 				mapflag |= MAP_PRIVATE;
@@ -44,17 +52,27 @@ int main(int argc, char *argv[]) {
 		case 'n':
 			nr = strtoul(optarg, NULL, 10);
 			break;
+		case 'v':
+			verbose = 1;
+			break;
 		}
 	}
 
+	Dprintf("HPS = %x\n", HPS);
 	signal(SIGUSR1, sig_handle);
-	p = checked_mmap((void *)ADDR_INPUT, nr * HPS, protflag, mapflag, -1, 0);
-	memset(p, 'a', nr * HPS);
+	if (HPS > 0) {
+		p = checked_mmap((void *)ADDR_INPUT, nr * HPS, protflag, mapflag, -1, 0);
+		memsize = nr * HPS;
+	} else {
+		p = checked_mmap((void *)ADDR_INPUT, nr * PS, protflag, mapflag, -1, 0);
+		memsize = nr * PS;
+	}
+	memset(p, 'a', memsize);
 	signal(SIGUSR1, sig_handle_flag);
 	pprintf("busy loop to check pageflags\n");
 	while (flag) {
 		usleep(1000);
-		memset(p, 'a', nr * HPS);
+		memset(p, 'a', memsize);
 	}
 	pprintf("%s exit\n", argv[0]);
 	pause();
