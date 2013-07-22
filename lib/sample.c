@@ -16,12 +16,15 @@ void sig_handle(int signo) { ; }
 void sig_handle_flag(int signo) { flag = 0; }
 
 int main(int argc, char *argv[]) {
+	int i;
 	int nr = 2;
 	char c;
 	char *p;
 	int mapflag = MAP_ANONYMOUS;
 	int protflag = PROT_READ|PROT_WRITE;
 	unsigned long memsize = 0;
+	unsigned long hpsizes[16]; /* possible hugepage size */
+	int nr_hpsize = 0;
 
 	while ((c = getopt(argc, argv, "h:m:p:n:v")) != -1) {
 		switch(c) {
@@ -31,6 +34,12 @@ int main(int argc, char *argv[]) {
                         if (HPS != 2097152 && HPS != 1073741824)
                                 errmsg("Invalid hugepage size\n");
 			mapflag |= MAP_HUGETLB;
+			nr_hpsize = get_hugepage_sizes(hpsizes);
+			for (i = 0; i < nr_hpsize; i++)
+				if (HPS == hpsizes[i])
+					break;
+			if (i == nr_hpsize) /* not found */
+				errmsg("invalid hugepage size\n");
                         break;
 		case 'm':
 			if (!strcmp(optarg, "private"))

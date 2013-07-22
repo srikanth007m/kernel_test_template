@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <dirent.h>
 
 #define MADV_HUGEPAGE           14
 #define MADV_NOHUGEPAGE         15
@@ -160,4 +161,27 @@ int pprintf(char *fmt, ...) {
         ret = write_check(pipefd, buf);
         close(pipefd);
         return ret;
+}
+
+#define SYSFS_HUGEPAGES_DIR "/sys/kernel/mm/hugepages/"
+
+int get_hugepage_sizes(unsigned long *hpsizes) {
+	int i = 0;
+	DIR *dir;
+	struct dirent *entry;
+
+	dir = opendir(SYSFS_HUGEPAGES_DIR);
+	if (dir) {
+		while ((entry = readdir(dir))) {
+			char *name = entry->d_name;
+			if (strncmp(name, "hugepages-", 10) != 0)
+				continue;
+			name += 10;
+			hpsizes[i] = atol(name) * 1024;
+			Dprintf("hpsizes[%d]; hpsize %x\n", i, hpsizes[i]);
+			i++;
+		}
+		closedir(dir);
+	}
+	return i;
 }
