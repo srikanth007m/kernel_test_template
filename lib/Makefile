@@ -20,7 +20,8 @@ install: $(exe)
 	done
 
 clean:
-	for file in $(exe) ; do \
+	@for file in $(exe) ; do \
 	  rm $(dstdir)/$$file 2> /dev/null ; \
 	  rm $(srcdir)/$$file 2> /dev/null ; \
+	  true ; \
 	done
