@@ -65,8 +65,8 @@ _do_test() {
     local line=
     local result=PASS
 
-    echo "---test start ($title)---------------------------------------------------------"
-    echo "$FUNCNAME '$title' $cmd $controller $checker"
+    echo "---test '$title' start---------------------------------------------------------"
+    echo "$FUNCNAME '$title' '$cmd' $controller $checker"
 
     prepare_test "$title"
 
@@ -103,7 +103,7 @@ do_test() {
     local checker="$4"
     _do_test "$title" "$cmd" "$controller" "$checker" | log
     $checker "$(cat ${TMPF}.returncode)"
-    echo_log "---test done ($title)------------------------------------------------"
+    echo_log "---test '$title' end------------------------------------------------"
 }
 
 # Usage: do_test_async <testtitle> <test controller> <result checker>
@@ -115,7 +115,7 @@ _do_test_async() {
     local checker="$3"
     local result=PASS
 
-    echo "---test start ($title)---------------------------------------------------------"
+    echo "---test '$title' start---------------------------------------------------------"
     echo "$FUNCNAME '$title' $controller $checker"
 
     prepare_test "$title"
@@ -131,5 +131,5 @@ do_test_async() {
     local checker="$3"
     _do_test_async "$title" "$controller" "$checker" | log
     $checker "$(cat ${TMPF}.returncode)"
-    echo_log "---test done ($title)------------------------------------------------"
+    echo_log "---test '$title' end------------------------------------------------"
 }
