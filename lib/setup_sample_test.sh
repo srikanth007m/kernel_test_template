@@ -6,8 +6,8 @@ if [[ "$0" =~ "$BASH_SOURCE" ]] ; then
 fi
 
 # Main test programs
-SAMPLE=${LDIR}/sample
-[ ! -x "$SAMPLE" ] && echo "${SAMPLE} not found." >&2 && exit 1
+TESTPROG=${LDIR}/sample
+[ ! -x "$TESTPROG" ] && echo "${TESTPROG} not found." >&2 && exit 1
 
 prepare_test() {
     get_kernel_message before
@@ -28,7 +28,7 @@ control_sample() {
             cat /proc/${pid}/numa_maps
             kill -SIGUSR1 ${pid}
             ;;
-        "${SAMPLE} exit")
+        "${TESTPROG} exit")
             kill -SIGUSR1 ${pid}
             return 0
             ;;
