@@ -84,16 +84,6 @@ void *checked_mmap(void *start, size_t length, int prot, int flags,
 	return map;
 }
 
-void Dprintf(const char *fmt, ...)
-{
-        if (verbose) {
-                va_list ap;
-                va_start(ap, fmt);
-                vprintf(fmt, ap);
-                va_end(ap);
-        }
-}
-
 void set_mergeable(char *ptr, int size) {
 	if (madvise(ptr, size, MADV_MERGEABLE) == -1)
 		perror("madvise");
@@ -143,6 +133,16 @@ static int write_check(int fd, char *str) {
         return ret;
 }
 
+static int __pipe_printf(char *buf) {
+	int pipefd = checked_open(testpipe, O_WRONLY);
+	int ret = write_check(pipefd, buf);
+	close(pipefd);
+	return ret;
+}
+
+/*
+ * If testpipe is given, write to the pipe. Otherwise, write to stdout.
+ */
 int pprintf(char *fmt, ...) {
         int ret;
 	char buf[PS];
@@ -151,16 +151,23 @@ int pprintf(char *fmt, ...) {
 	va_start(ap, fmt);
 	vsprintf(buf, fmt, ap);
 	va_end(ap);
-        if (verbose)
-		printf(buf);
 	if (!testpipe)
-		return 0;
-        int pipefd = open(testpipe, O_WRONLY);
-        if (pipefd < 0)
-                err("open pipe");
-        ret = write_check(pipefd, buf);
-        close(pipefd);
+		ret = printf(buf);
+	else
+		ret = __pipe_printf(buf);
         return ret;
+}
+
+void Dprintf(const char *fmt, ...)
+{
+        if (verbose) {
+		char buf[PS];
+		va_list ap;
+		va_start(ap, fmt);
+		vsprintf(buf, fmt, ap);
+		pprintf(buf);
+		va_end(ap);
+        }
 }
 
 #define SYSFS_HUGEPAGES_DIR "/sys/kernel/mm/hugepages/"
