@@ -46,9 +46,10 @@ int main(int argc, char *argv[]) {
 			reserveonly = 1;
 			break;
 		case 'm':
-			if (!strcmp(optarg, "private"))
+			if (!strcmp(optarg, "private")) {
 				mapflag |= MAP_PRIVATE;
-			else if (!strcmp(optarg, "shared"))
+				mapflag &= ~MAP_SHARED;
+			} else if (!strcmp(optarg, "shared"))
 				mapflag |= MAP_SHARED;
 			else
 				errmsg("invalid optarg for -m\n");
@@ -71,15 +72,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	Dprintf("HPS = %x\n", HPS);
 	signal(SIGUSR1, sig_handle);
-	if (HPS > 0) {
-		p = checked_mmap((void *)ADDR_INPUT, nr * HPS, protflag, mapflag, -1, 0);
+	if (HPS > 0)
 		memsize = nr * HPS;
-	} else {
-		p = checked_mmap((void *)ADDR_INPUT, nr * PS, protflag, mapflag, -1, 0);
+	else
 		memsize = nr * PS;
-	}
+	Dprintf("memsize = 0x%x, hpsize = %d, mapflag = 0x%x\n", memsize, HPS, mapflag);
+	p = checked_mmap((void *)ADDR_INPUT, nr * PS, protflag, mapflag, -1, 0);
 	if (!reserveonly)
 		memset(p, 'a', memsize);
 	signal(SIGUSR1, sig_handle_flag);
