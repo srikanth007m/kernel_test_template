@@ -123,7 +123,7 @@ int put_semaphore(int sem_id, struct sembuf *sembuffer)
 	return semop(sem_id, sembuffer, 1);
 }
 
-static int write_check(int fd, char *str) {
+static int checked_write(int fd, char *str) {
         int ret;
         if (fd == 0)
                 fd = 1;
@@ -135,7 +135,7 @@ static int write_check(int fd, char *str) {
 
 static int __pipe_printf(char *buf) {
 	int pipefd = checked_open(testpipe, O_WRONLY);
-	int ret = write_check(pipefd, buf);
+	int ret = checked_write(pipefd, buf);
 	close(pipefd);
 	return ret;
 }
