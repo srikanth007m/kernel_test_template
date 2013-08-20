@@ -24,23 +24,12 @@ int main(int argc, char *argv[]) {
 	int protflag = PROT_READ|PROT_WRITE;
 	int reserveonly = 0;
 	unsigned long memsize = 0;
-	unsigned long hpsizes[16]; /* possible hugepage size */
-	int nr_hpsize = 0;
 
 	while ((c = getopt(argc, argv, "h:rm:p:n:v")) != -1) {
 		switch(c) {
                 case 'h':
                         HPS = strtoul(optarg, NULL, 10) * 1024;
-                        /* todo: arch independent */
-                        if (HPS != 2097152 && HPS != 1073741824)
-                                errmsg("Invalid hugepage size\n");
 			mapflag |= MAP_HUGETLB;
-			nr_hpsize = get_hugepage_sizes(hpsizes);
-			for (i = 0; i < nr_hpsize; i++)
-				if (HPS == hpsizes[i])
-					break;
-			if (i == nr_hpsize) /* not found */
-				errmsg("invalid hugepage size\n");
                         break;
 		case 'r': /* just reserve */
 			reserveonly = 1;
@@ -73,9 +62,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	signal(SIGUSR1, sig_handle);
-	if (HPS > 0)
+	if (HPS > 0) {
+		validate_hugepage_size(HPS);
 		memsize = nr * HPS;
-	else
+	} else
 		memsize = nr * PS;
 	Dprintf("memsize = 0x%x, hpsize = %d, mapflag = 0x%x\n", memsize, HPS, mapflag);
 	p = checked_mmap((void *)ADDR_INPUT, nr * PS, protflag, mapflag, -1, 0);

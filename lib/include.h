@@ -192,3 +192,21 @@ int get_hugepage_sizes(unsigned long *hpsizes) {
 	}
 	return i;
 }
+
+/* todo: make it arch independent */
+void validate_hugepage_size(unsigned long hpsize) {
+	int i;
+	unsigned long hpsizes[16]; /* possible hugepage size */
+	char buf[1024];
+	int nr_hpsize = get_hugepage_sizes(hpsizes);
+	for (i = 0; i < nr_hpsize; i++)
+		if (hpsize == hpsizes[i])
+			break;
+	if (i == nr_hpsize) { /* not found */
+		sprintf(buf, "Invalid hugepage size:\n\tpossible values: ");
+		for (i = 0; i < nr_hpsize; i++)
+			sprintf(buf, "%s %d", buf, hpsizes[i]/1024);
+		sprintf(buf, "%s\n", buf);
+		errmsg(buf);
+	}
+}
