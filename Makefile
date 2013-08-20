@@ -4,6 +4,9 @@ all:
 test: all
 	@bash run-test.sh
 
+testv: all
+	@bash run-test.sh -v
+
 clean:
 	@make clean -C lib
 
