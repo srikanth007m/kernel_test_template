@@ -13,7 +13,7 @@
 #define err(x) perror(x),exit(EXIT_FAILURE)
 #define errmsg(x) fprintf(stderr, x),exit(EXIT_FAILURE)
 #define PSIZE 4096
-int HPSIZE = 0;
+unsigned long HPSIZE = 0;
 #define PS PSIZE
 #define HPS HPSIZE
 #define strpair(x) x, strlen(x)
@@ -82,6 +82,14 @@ void *checked_mmap(void *start, size_t length, int prot, int flags,
 	if (map == (void*)-1L)
 		err("mmap");
 	return map;
+}
+
+void *checked_malloc(size_t size) {
+	void *p;
+	p = malloc(size);
+	if (!p)
+		err("malloc");
+	return p;
 }
 
 void set_mergeable(char *ptr, int size) {
@@ -185,7 +193,6 @@ int get_hugepage_sizes(unsigned long *hpsizes) {
 				continue;
 			name += 10;
 			hpsizes[i] = atol(name) * 1024;
-			Dprintf("hpsizes[%d]; hpsize %x\n", i, hpsizes[i]);
 			i++;
 		}
 		closedir(dir);
