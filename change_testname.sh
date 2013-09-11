@@ -11,6 +11,6 @@ echo "change testname to $TESTNAME"
 ruby -i -ne "puts \$_.gsub(/sample/, \"${TESTNAME}\")" run-test.sh
 ruby -i -ne "puts \$_.gsub(/sample/, \"${TESTNAME}\")" lib/Makefile
 ruby -i -ne "puts \$_.gsub(/sample/, \"${TESTNAME}\")" lib/setup_sample_test.sh
-mv lib/sample.c lib/${TOOLSNAME}.c
-mv lib/setup_sample_tools.sh lib/setup_${TOOLSNAME}_test.sh
+mv lib/sample.c lib/${TESTNAME}.c
+mv lib/setup_sample_tools.sh lib/setup_${TESTNAME}_test.sh
 mv lib/setup_sample_test.sh lib/setup_${TESTNAME}_test.sh
