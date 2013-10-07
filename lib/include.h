@@ -16,6 +16,7 @@
 unsigned long HPSIZE = 0;
 #define PS PSIZE
 #define HPS HPSIZE
+#define THPS 0x200000UL
 #define strpair(x) x, strlen(x)
 
 /* Control early_kill/late_kill */
