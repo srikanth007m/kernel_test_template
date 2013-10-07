@@ -79,7 +79,7 @@ static int checked_open(const char *pathname, int flags)
 void *checked_mmap(void *start, size_t length, int prot, int flags,
                    int fd, off_t offset) {
 	void *map = mmap(start, length, prot, flags, fd, offset);
-	if (map == (void*)-1L)
+	if ((start && map != start) || (!start && map == (void*)-1L))
 		err("mmap");
 	return map;
 }
