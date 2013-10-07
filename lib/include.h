@@ -92,6 +92,12 @@ void *checked_malloc(size_t size) {
 	return p;
 }
 
+int *checked_munmap(void *start, size_t length) {
+        if (munmap(start, length) == -1)
+                err("munmap");
+        return 0;
+}
+
 void set_mergeable(char *ptr, int size) {
 	if (madvise(ptr, size, MADV_MERGEABLE) == -1)
 		perror("madvise");
